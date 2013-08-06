@@ -1,0 +1,15 @@
+!!!5
+html
+	head
+		title #{title}
+	body
+		form(action="/",method="post")
+			input(name="name") Your name
+			input(type="submit") Submit
+
+		h1 Users
+
+		ul
+			each item in users
+				li #{item.name}&nbsp;&nbsp;
+					a(href='/#{item.id}/delete') DELETE

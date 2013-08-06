@@ -1,0 +1,10 @@
+{
+	"name": "streamgizmo-node",
+	"version": "0.0.1",
+	"dependencies": {
+		"express": "3.3.4",
+		"mongoose": "*",
+		"socket.io": "*",
+		"jade": "*"
+	}
+}
