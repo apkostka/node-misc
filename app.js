@@ -1,6 +1,6 @@
 var express = require('express'),
 		jade = require('jade'),
-		users,
+		models = require('./app/models.js'),
 		newUser,
 		app = express();
 
@@ -16,9 +16,6 @@ app.set('views', __dirname + '/app/views')
 app.set('view engine', 'jade')
 app.use(express.static(__dirname + '/assets'))
 app.use(express.bodyParser())
-
-/* Connect to mongodb, create models */
-var models = require('./app/models.js');
 
 // GET / - Get Users
 app.get('/', function(req, res) {
