@@ -33,7 +33,7 @@ io.sockets.on('connection', function (socket) {
   });
   socket.on('deleteUser', function (data) {
     models.User.findByIdAndRemove(data.id, function(err, user) {
-    	io.sockets.emit('deleteUser', { id: user.id })
+    	io.sockets.emit('deleteUser', { id: data.id })
     })
   });
 });
