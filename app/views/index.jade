@@ -2,14 +2,45 @@
 html
 	head
 		title #{title}
+		script(src="http://code.jquery.com/jquery-latest.min.js")
 		script(src="http://localhost:8080/socket.io/socket.io.js")
 		script(type='text/javascript').
 			var socket = io.connect('http://localhost:8080');
-			socket.on('news', function (data) {
-				console.log(data);
-				socket.emit('my other event', { my: 'data' });
+
+			jQuery(function ($) {
+				if (socket) {
+					$('form').on('submit', function(e) {
+						e.preventDefault();
+						socket.emit('addUser', { name: $('input[name="name"]').val() })
+						return false;
+					})
+					socket.on('newUser', function (data) {
+						console.log(data)
+						$('ul.users').append('<li id="'+data.id+'">'+data.name+' <a class="delete" href="/'+data.id+'/delete">DELETE</a></li>')
+						$('a.delete').on('click', function(e) {
+							e.preventDefault();
+							socket.emit('deleteUser', { id: $(this).parent().attr('id') })
+							return false
+						})
+					})
+
+					$('a.delete').on('click', function(e) {
+						e.preventDefault();
+						socket.emit('deleteUser', { id: $(this).parent().attr('id') })
+						return false
+					})
+					socket.on('deleteUser', function (data) {
+						$('ul.users li#'+data.id+'').remove()
+					})
+				}
 			});
+
+
 	body
 		form(action="/",method="post")
-			input(name="name") Your name
-			input(type="submit") Submit
+			input(name="name",id="name",placeholder="User Name")
+
+		ul(class="users")
+			each item in users
+				li(id=#{item.id}) #{item.name}&nbsp;&nbsp;
+					a(href='/#{item.id}/delete',class="delete") DELETE

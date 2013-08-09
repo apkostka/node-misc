@@ -18,17 +18,23 @@ app.get('/', function(req, res) {
 	models.User.find(function(err, users){
 		res.render('index',
 			{ 
-				title: 'Home'
-				//users: users
+				title: 'Home',
+				users: users
 			}
 		)
 	})
 });
 
 io.sockets.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
+  socket.on('addUser', function (data) {
+    newUser = new models.User({name: data.name})
+    newUser.save()
+    io.sockets.emit('newUser', { name: newUser.name, id: newUser.id })
+  });
+  socket.on('deleteUser', function (data) {
+    models.User.findByIdAndRemove(data.id, function(err, user) {
+    	io.sockets.emit('deleteUser', { id: user.id })
+    })
   });
 });
 
@@ -36,7 +42,6 @@ io.sockets.on('connection', function (socket) {
 app.post('/', function(req, res) {
 	newUser = new models.User({name: req.body.name});
 	newUser.save();
-	console.log(newUser);
 	res.redirect('/')
 })
 
