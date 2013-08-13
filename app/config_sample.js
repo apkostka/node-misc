@@ -15,19 +15,7 @@ module.exports = function(app, express, mongoose){
     app.use(express.methodOverride());
     app.use(app.router);
     app.use(express.static(__dirname + '/assets'));
-  });
-
-  //env specific config
-  app.configure('development', function(){
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-
-    exports.default_db_uri = 'mongodb://localhost/streamgizmo';
-  });
-
-  app.configure('production', function(){
-    app.use(express.errorHandler());
-
-    exports.default_db_uri = 'mongodb://localhost/streamgizmo';
   });
 
 	config.services = {

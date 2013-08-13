@@ -4,9 +4,7 @@ module.exports = function(mongoose){
 	var ObjectId = Schema.ObjectId;
 
 	var schema = new Schema({
-	  author: ObjectId,
-	  name: String,
-	  date: Date
+	  name: String
 	});
 
 	return mongoose.model(collection, schema);
