@@ -6,6 +6,12 @@
 		"mongoose": "*",
 		"socket.io": "*",
 		"jade": "*",
-		"twit": "*"
+		"twit": "*",
+		"fb": "*",
+		"flickr": "*",
+		"feedparser": "*",
+		"youtube-feeds": "*",
+		"instagram-node-lib": "*",
+		"n-vimeo": "*"
 	}
 }
