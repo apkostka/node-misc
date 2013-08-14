@@ -1,4 +1,4 @@
-module.exports = function(app, mongoose, models, helpers){
+module.exports = function(app, mongoose, models, helpers, config){
 
 	//GET /
 	app.get('/', function(req, res){
@@ -11,7 +11,7 @@ module.exports = function(app, mongoose, models, helpers){
 		*/
 
 		/*Facebook
-		helpers.facebook.api('brookfieldla/posts', {access_token: '580626551988812|1ukVg4Yr_gtyzFAt2vrZUmyRpoQ' }, function(reply){
+		helpers.facebook.api('brookfieldla/posts', {access_token: config.services.facebook.appId+'|'+config.services.facebook.appSecret }, function(reply){
 			if(!res || res.error) {
 				console.log(res.error)
 				return;

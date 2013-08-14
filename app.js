@@ -20,7 +20,7 @@ var models = {};
 models.User = require('./app/models/users')(mongoose)
 
 //Routes
-require('./app/routes')(app, mongoose, models, helpers)
+require('./app/routes')(app, mongoose, models, helpers, config)
 
 //Presto.
 app.listen(3000);
