@@ -1,11 +1,12 @@
 module.exports = function(mongoose, models){
-	var collection = 'users';
+	var collection = 'posts';
 	var Schema = mongoose.Schema;
 	var ObjectId = Schema.ObjectId;
 
 	var schema = new Schema({
-	  name: String,
-	  streams: [models.Stream]
+	  service_id: String,
+	  content: String,
+	  date: Date
 	});
 
 	return mongoose.model(collection, schema);

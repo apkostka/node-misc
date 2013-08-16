@@ -3,44 +3,12 @@ html
 	head
 		title #{title}
 		script(src="http://code.jquery.com/jquery-latest.min.js")
-		script(src="http://localhost:8080/socket.io/socket.io.js")
-		script(type='text/javascript').
-			var socket = io.connect('http://localhost:8080');
-
-			jQuery(function ($) {
-				if (socket) {
-					$('form').on('submit', function(e) {
-						e.preventDefault();
-						socket.emit('addUser', { name: $('input[name="name"]').val() })
-						return false;
-					})
-					socket.on('newUser', function (data) {
-						console.log(data)
-						$('ul.users').append('<li id="'+data.id+'">'+data.name+' <a class="delete" href="/'+data.id+'/delete">DELETE</a></li>')
-						$('a.delete').on('click', function(e) {
-							e.preventDefault();
-							socket.emit('deleteUser', { id: $(this).parent().attr('id') })
-							return false
-						})
-					})
-
-					$('a.delete').on('click', function(e) {
-						e.preventDefault();
-						socket.emit('deleteUser', { id: $(this).parent().attr('id') })
-						return false
-					})
-					socket.on('deleteUser', function (data) {
-						$('ul.users li#'+data.id+'').remove()
-					})
-				}
-			});
-
 
 	body
-		form(action="/",method="post")
-			input(name="name",id="name",placeholder="User Name")
+		form(action="/",method="get")
+			input(type="text",name="q",placeholder="Search for...")
+			button(type="submit") Search
 
-		ul(class="users")
-			each item in users
-				li(id='#{item.id}') #{item.name}&nbsp;&nbsp;
-					a(href='/#{item.id}/delete',class="delete") DELETE
+		ul
+			for post in posts
+				li #{post.text}

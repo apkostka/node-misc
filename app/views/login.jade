@@ -1,0 +1,11 @@
+!!!5
+html
+	head
+		title #{title}
+		script(src="http://code.jquery.com/jquery-latest.min.js")
+
+	body
+		form(action="/login",method="post")
+			input(name="uname",id="uname",placeholder="User Name")
+			input(type="password",name="pword",id="pword",placeholder="Password")
+			input(type="submit",id="submit",value="Log In")

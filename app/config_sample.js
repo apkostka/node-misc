@@ -11,6 +11,7 @@ module.exports = function(app, express, mongoose){
     app.use(express.bodyParser());
     app.use(express.cookieParser());
     app.use(express.session({ secret: 'xx83983' }));
+    app.use(flash());
     app.use(express.bodyParser());
     app.use(express.methodOverride());
     app.use(app.router);

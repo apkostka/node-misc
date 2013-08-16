@@ -2,8 +2,6 @@
 var express = require('express'),
 		app = module.exports = express(),
 		io = require('socket.io'),
-		jade = require('jade'),
-		mongoose = require('mongoose'),
 
 		//Custom modules
 		config = require('./app/config.js')(app, express),
@@ -17,10 +15,13 @@ db.on('error', console.error.bind(console, 'connection error:'));
 
 //Models
 var models = {};
-models.User = require('./app/models/users')(mongoose)
+models.Post_Cache = require('./app/models/posts_cache')(helpers.mongoose, models);
+models.Post = require('./app/models/posts')(helpers.mongoose, models);
+models.Stream = require('./app/models/streams')(helpers.mongoose, models);
+models.User = require('./app/models/users')(helpers.mongoose, models);
 
 //Routes
-require('./app/routes')(app, mongoose, models, helpers, config)
+require('./app/routes')(app, models, helpers, config)
 
 //Presto.
 app.listen(3000);
