@@ -5,10 +5,13 @@ html
 		script(src="http://code.jquery.com/jquery-latest.min.js")
 
 	body
-		form(action="/",method="get")
+		form(action="/",method="post")
 			input(type="text",name="q",placeholder="Search for...")
 			button(type="submit") Search
 
 		ul
 			for post in posts
-				li #{post.text}
+				li 
+					a(href="https://twitter.com/#{post.user_id}/statuses/#{post.service_id}", target="_blank") #{post.content}
+
+		a(href="/streams/clear") Clear Stream

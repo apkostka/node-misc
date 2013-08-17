@@ -6,38 +6,49 @@ module.exports = function(app, models, helpers, config){
 
 	//READ INDEX
 	app.get('/', function(req, res){
-		
-		//If query, get posts from Twitter
-		if (typeof req.query.q !== 'undefined') {
-			this.twitter.get('/search/tweets', { q: req.query.q, count: 5 }, function(err, reply){
-       if(err) { console.log(err) }
-       	console.log(reply);
-       	newPosts = reply.statuses;
+		models.Stream.findOne({ name: 'sample' }, function(err, stream){
+			var twitter_max_id = stream.posts_cache.sort('field -service_id');
+			console.log(twitter_max_id);
+			twitter_max_id.forEach(function(el, index){
+				console.log(el.service_id);
+			})
 
-       	var stream = models.Stream.find({name:'sample'});
+			if(err) res.json(err) 
+			res.render('index', { title: 'StreamGizmo', posts: stream.posts_cache }, function(err, html){
+				if(err) console.log(err);
+				res.send(html);
+			});
+		});
+	});
 
-       	stream.findOne(function(err, stream){
-       		if(err) console.log(err);
-	       	//Save to posts-cache
-					for (post in newPosts){
-						stream.posts_cache.push({
-							service_id: post.id_str,
-							service_type: 'twitter',
-							content: post.text,
-							date: new Date(post.created_at),
-							created_at: new Date()
-						});
-					};
-					stream.save();
-					posts = stream.posts_cache;
+	app.post('/', function(req,res){
+
+		models.Stream.findOne({name: 'sample'}, function(err,stream){
+			var twitter_max_id = stream.posts_cache.sort('field service_id')[0];
+			console.log(twitter_max_id);
+
+			helpers.twitter.get('/search/tweets', { q: req.body.q + '-RT', count: 5, since_id: twitter_max_id }, function(err, reply){
+				if(err) { console.log(err) };
+				
+				reply.statuses.forEach(function(el, index){
+					
+					stream.posts_cache.push({
+						service_id: el.id_str,
+						service_type: 'twitter',
+						user_id: el.user.id_str,
+						content: el.text,
+						date: new Date(el.created_at)
+					});
+
 				});
-     	});
-		}
+				stream.save(function(err){
+					if(err) console.log(err);
+					res.redirect('/');
+				});
 
-		res.render('index', { title: 'StreamGizmo', posts: posts }, function(err, html){
-			if(err) console.log(err);
-			res.send(html)
-		})
+			});
+		});
+
 	})
 
 	//CREATE NEW STREAM
@@ -46,13 +57,25 @@ module.exports = function(app, models, helpers, config){
 		stream.save(function(err){
 			if(err) console.log(err);
 			console.log(stream);
-			res.redirect('/streams/'+stream.id);
+			res.redirect('/');
 		})
+	})
+
+	app.get('/streams/clear', function(req,res){
+		models.Stream.findOne({ name: 'sample' }, function(err, stream){
+			stream.update({posts_cache: []}, function(err){
+				if(err) res.json(err);
+				res.redirect('/');
+			});
+		});
 	})
 
 	//READ LIST OF STREAMS
 	app.get('/streams', function(req, res){
-
+		res.render('new-stream', {title: "New Stream"}, function(err,html){
+			if(err) console.log(err);
+			res.send(html);
+		})
 	})
 
 	//READ SINGLE STREAM

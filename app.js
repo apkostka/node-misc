@@ -18,7 +18,7 @@ var models = {};
 models.Post_Cache = require('./app/models/posts_cache')(helpers.mongoose, models);
 models.Post = require('./app/models/posts')(helpers.mongoose, models);
 models.Stream = require('./app/models/streams')(helpers.mongoose, models);
-models.User = require('./app/models/users')(helpers.mongoose, models);
+//models.User = require('./app/models/users')(helpers.mongoose, models);
 
 //Routes
 require('./app/routes')(app, models, helpers, config)

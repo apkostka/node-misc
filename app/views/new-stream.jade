@@ -1,0 +1,10 @@
+!!!5
+html
+	head
+		title #{title}
+		script(src="http://code.jquery.com/jquery-latest.min.js")
+
+	body
+		form(action="/streams/new",method="post")
+			input(type="text",name="name",placeholder="Stream Name")
+			button(type="submit") Post
