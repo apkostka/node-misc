@@ -11,8 +11,10 @@ module.exports = function(mongoose, models){
 	  date: Date,
 	  createdAt: {
 	  	type: Date,
-	  	expires: '0.5h',
-	  	default: Date.now
+	  	default: Date.now,
+	  	index: {
+	  		expireAfterSeconds: 60
+	  	}
 	  }
 	});
 

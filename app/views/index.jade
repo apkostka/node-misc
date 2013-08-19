@@ -9,9 +9,18 @@ html
 			input(type="text",name="q",placeholder="Search for...")
 			button(type="submit") Search
 
+		h2 Unapproved Posts
+		ul
+			for post in posts_cache
+				li 
+					form(method="post",action="/streams/#{post._id}")
+						a(href="https://twitter.com/#{post.user_id}/statuses/#{post.service_id}", target="_blank") #{post.content}
+						input(type="submit",value="Approve")
+
+		a(href="/streams/clear") Clear Cache
+
+		h2 Approved Posts
 		ul
 			for post in posts
 				li 
 					a(href="https://twitter.com/#{post.user_id}/statuses/#{post.service_id}", target="_blank") #{post.content}
-
-		a(href="/streams/clear") Clear Stream

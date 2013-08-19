@@ -7,14 +7,8 @@ module.exports = function(app, models, helpers, config){
 	//READ INDEX
 	app.get('/', function(req, res){
 		models.Stream.findOne({ name: 'sample' }, function(err, stream){
-			var twitter_max_id = stream.posts_cache.sort('field -service_id');
-			console.log(twitter_max_id);
-			twitter_max_id.forEach(function(el, index){
-				console.log(el.service_id);
-			})
-
 			if(err) res.json(err) 
-			res.render('index', { title: 'StreamGizmo', posts: stream.posts_cache }, function(err, html){
+			res.render('index', { title: 'StreamGizmo', posts_cache: stream.posts_cache, posts: stream.posts }, function(err, html){
 				if(err) console.log(err);
 				res.send(html);
 			});
@@ -24,10 +18,13 @@ module.exports = function(app, models, helpers, config){
 	app.post('/', function(req,res){
 
 		models.Stream.findOne({name: 'sample'}, function(err,stream){
-			var twitter_max_id = stream.posts_cache.sort('field service_id')[0];
-			console.log(twitter_max_id);
+			/* Get ID of last tweet retrieved
+			if (stream.posts_cache.length !== 0){
+				var twitter_max_id = stream.posts_cache.sort("service_id")[stream.posts_cache.length - 1].service_id;
+			}
+			*/
 
-			helpers.twitter.get('/search/tweets', { q: req.body.q + '-RT', count: 5, since_id: twitter_max_id }, function(err, reply){
+			helpers.twitter.get('/search/tweets', { q: req.body.q, count: 5, lang: 'en' }, function(err, reply){
 				if(err) { console.log(err) };
 				
 				reply.statuses.forEach(function(el, index){
@@ -85,7 +82,28 @@ module.exports = function(app, models, helpers, config){
 
 	//ADD ITEM(S) TO STREAM
 	app.post('/streams/:id', function(req, res){
+		models.Stream.findOne({ name: 'sample' }, function(err, stream){
+			stream.update({posts_cache: []}, function(err){
+				if(err) res.json(err);
 
+				var postID = stream.posts_cache.id(req.params.id);
+
+				stream.posts.push({
+						service_id: postID.service_id,
+						service_type: postID.service_type,
+						user_id: postID.user_id,
+						content: postID.content,
+						date: postID.created_at
+				});
+
+				console.log(postID);
+
+				stream.save(function(err){
+					if(err) console.log(err);
+					res.redirect('/');
+				});
+			});
+		});
 	})
 
 }
