@@ -1,7 +1,6 @@
 module.exports = function(config){
 	
 	this.jade = require('jade'),
-	this.mongoose = require('mongoose');
 	this.bcrypt = require('bcrypt');
 	this.flash = require('connect-flash');
 

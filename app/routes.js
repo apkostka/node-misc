@@ -1,12 +1,16 @@
 module.exports = function(app, models, helpers, config){
 
-	var stream,
-			newPosts,
-			posts = {};
-
 	//READ INDEX
 	app.get('/', function(req, res){
 		models.Stream.findOne({ name: 'sample' }, function(err, stream){
+			/*if (stream.posts_cache.length !== 0){
+				stream.findOne({ 'posts_cache.query': 'nba' }, { 'posts_cache.service_id': 1 },
+					function(err, posts_cache){
+						if(err) console.log(err);
+						console.log(posts_cache);
+					}
+				);
+			}*/
 			if(err) res.json(err) 
 			res.render('index', { title: 'StreamGizmo', posts_cache: stream.posts_cache, posts: stream.posts }, function(err, html){
 				if(err) console.log(err);
@@ -24,7 +28,7 @@ module.exports = function(app, models, helpers, config){
 			}
 			*/
 
-			helpers.twitter.get('/search/tweets', { q: req.body.q, count: 5, lang: 'en' }, function(err, reply){
+			helpers.twitter.get('/search/tweets', { q: req.body.q + '-RT', count: 5, lang: 'en' }, function(err, reply){
 				if(err) { console.log(err) };
 				
 				reply.statuses.forEach(function(el, index){
@@ -32,9 +36,11 @@ module.exports = function(app, models, helpers, config){
 					stream.posts_cache.push({
 						service_id: el.id_str,
 						service_type: 'twitter',
+						query: req.body.q,
 						user_id: el.user.id_str,
 						content: el.text,
-						date: new Date(el.created_at)
+						date: Date(el.created_at),
+						created_at: new Date(Date())
 					});
 
 				});
@@ -58,22 +64,24 @@ module.exports = function(app, models, helpers, config){
 		})
 	})
 
+	//NEW STREAM FORM
+	app.get('/streams/new', function(req, res){
+		res.render('new-stream', {title: "New Stream"}, function(err,html){
+			if(err) console.log(err);
+			res.send(html);
+		})
+	})
+
+	//CLEAR STREAM CACHE
 	app.get('/streams/clear', function(req,res){
 		models.Stream.findOne({ name: 'sample' }, function(err, stream){
-			stream.update({posts_cache: []}, function(err){
+			stream.update({posts_cache: [], posts: []}, function(err){
 				if(err) res.json(err);
 				res.redirect('/');
 			});
 		});
 	})
 
-	//READ LIST OF STREAMS
-	app.get('/streams', function(req, res){
-		res.render('new-stream', {title: "New Stream"}, function(err,html){
-			if(err) console.log(err);
-			res.send(html);
-		})
-	})
 
 	//READ SINGLE STREAM
 	app.get('/streams/:id', function(req, res){
@@ -83,25 +91,19 @@ module.exports = function(app, models, helpers, config){
 	//ADD ITEM(S) TO STREAM
 	app.post('/streams/:id', function(req, res){
 		models.Stream.findOne({ name: 'sample' }, function(err, stream){
-			stream.update({posts_cache: []}, function(err){
-				if(err) res.json(err);
+			if(err) res.json(err);
+			var postID = stream.posts_cache.id(req.params.id);
+			stream.posts.push({
+					service_id: postID.service_id,
+					service_type: postID.service_type,
+					user_id: postID.user_id,
+					content: postID.content,
+					date: postID.created_at
+			});
 
-				var postID = stream.posts_cache.id(req.params.id);
-
-				stream.posts.push({
-						service_id: postID.service_id,
-						service_type: postID.service_type,
-						user_id: postID.user_id,
-						content: postID.content,
-						date: postID.created_at
-				});
-
-				console.log(postID);
-
-				stream.save(function(err){
-					if(err) console.log(err);
-					res.redirect('/');
-				});
+			stream.save(function(err){
+				if(err) console.log(err);
+				res.redirect('/');
 			});
 		});
 	})
